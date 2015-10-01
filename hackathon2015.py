@@ -1,14 +1,14 @@
 from flask import Flask
 from flask import make_response
 from StringIO import StringIO
-from emailObject import Email
+from email_object import Email
 import csv
-import mongoPresistence
+import mongo_presistence
 
 import gmailoauth
 
 app = Flask(__name__)
-db = mongoPresistence.get_db()
+db = mongo_presistence.get_db()
 
 
 @app.route('/')
@@ -42,8 +42,8 @@ def generate_csv_as_stringio(emails):
 def load_csv():
     emails = []
     with open('EMAIL.CSV', 'rb') as csvfile:
-        spamreader = csv.reader(csvfile, skipinitialspace=True)
-        for row in spamreader:
+        reader = csv.reader(csvfile, skipinitialspace=True)
+        for row in reader:
             emails.append(Email(row[7], row[8], row[9], row[5], row[10]))
     return emails
 
