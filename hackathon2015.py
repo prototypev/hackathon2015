@@ -3,9 +3,11 @@ from flask import make_response
 from StringIO import StringIO
 from emailObject import Email
 import csv
+import mongoPresistence
 
 
 app = Flask(__name__)
+db = mongoPresistence.get_db()
 
 
 @app.route('/')
