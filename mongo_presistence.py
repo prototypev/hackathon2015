@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 
-
+# mongod --dbpath ~/IdeaProjects/hackathon2015/mongodb
 mongodb_url = 'mongodb://localhost:27017/'
 
 

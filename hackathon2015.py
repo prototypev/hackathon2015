@@ -1,5 +1,6 @@
 from flask import Flask
 from flask import make_response
+from flask import render_template
 from StringIO import StringIO
 from email_object import Email
 import csv
@@ -12,8 +13,8 @@ db = mongo_presistence.get_db()
 
 
 @app.route('/')
-def hello_world():
-    return 'Hello World!'
+def hello():
+    return render_template('hello.html')
 
 
 @app.route('/crawl')
