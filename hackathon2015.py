@@ -5,6 +5,7 @@ from emailObject import Email
 import csv
 import mongoPresistence
 
+import gmailoauth
 
 app = Flask(__name__)
 db = mongoPresistence.get_db()
@@ -13,6 +14,12 @@ db = mongoPresistence.get_db()
 @app.route('/')
 def hello_world():
     return 'Hello World!'
+
+
+@app.route('/crawl')
+def crawl():
+    messages = gmailoauth.crawl_inbox()
+    return str(len(messages)) + ' emails crawled'
 
 
 @app.route('/csv')
