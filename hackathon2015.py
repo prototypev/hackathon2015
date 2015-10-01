@@ -3,10 +3,12 @@ from flask import make_response
 from StringIO import StringIO
 from emailObject import Email
 import csv
+import mongoPresistence
 
 import gmailoauth
 
 app = Flask(__name__)
+db = mongoPresistence.get_db()
 
 
 @app.route('/')
