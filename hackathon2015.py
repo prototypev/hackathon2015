@@ -53,19 +53,30 @@ def download_csv():
 def generate_csv_as_stringio(emails):
     si = StringIO()
     for e in emails:
-        si.write(str(e))
-        si.write("\n")
+        try:
+            si.write(str(e))
+            si.write("\n")
+        except Exception as e:
+            print e
     return si
 
 
 def load_csv():
     emails = mongo_presistence.get_email_collection(db).find()
+    result = []
+    for email in emails:
+        print email
+        try:
+            result.append(email['from_email'] + ',' + email['to_email'] + ',' + email['date'])
+        except Exception as e:
+            print e
+
     # emails = []
     # with open('EMAIL.CSV', 'rb') as csvfile:
     #     reader = csv.reader(csvfile, skipinitialspace=True)
     #     for row in reader:
     #         emails.append(Email(row[7], row[8], row[9], row[5], row[10]))
-    return emails
+    return result
 
 
 if __name__ == '__main__':
