@@ -17,19 +17,37 @@ def hello():
     return render_template('hello.html')
 
 
+@app.route('/doOauth')
+def do_oauth():
+    gmailoauth.get_credentials()
+    return 'OAuth done'
+
+
+@app.route('/revokeOauth')
+def revoke_oauth():
+    gmailoauth.revoke_credentials()
+    return 'OAuth revoked'
+
+
 @app.route('/crawl')
 def crawl():
-    messages = gmailoauth.crawl_inbox()
-    return str(len(messages)) + ' emails crawled'
+    emails = gmailoauth.crawl_inbox()
+
+    mongo_presistence.delete_emails(db)
+    for email in emails:
+        json = email.to_json()
+        mongo_presistence.insert_email(db, json)
+
+    return str(len(emails)) + ' emails crawled'
 
 
-# @app.route('/csv')
-# def download_csv():
-#     si = generate_csv_as_stringio(load_csv())
-#     output = make_response(si.getvalue())
-#     output.headers["Content-Disposition"] = "attachment; filename=export.csv"
-#     output.headers["Content-type"] = "text/csv"
-#     return output
+@app.route('/csv')
+def download_csv():
+    si = generate_csv_as_stringio(load_csv())
+    output = make_response(si.getvalue())
+    output.headers["Content-Disposition"] = "attachment; filename=export.csv"
+    output.headers["Content-type"] = "text/csv"
+    return output
 
 
 def generate_csv_as_stringio(emails):
@@ -40,13 +58,14 @@ def generate_csv_as_stringio(emails):
     return si
 
 
-# def load_csv():
-#     emails = []
-#     with open('EMAIL.CSV', 'rb') as csvfile:
-#         reader = csv.reader(csvfile, skipinitialspace=True)
-#         for row in reader:
-#             emails.append(Email(row[7], row[8], row[9], row[5], row[10]))
-#     return emails
+def load_csv():
+    emails = mongo_presistence.get_email_collection(db).find()
+    # emails = []
+    # with open('EMAIL.CSV', 'rb') as csvfile:
+    #     reader = csv.reader(csvfile, skipinitialspace=True)
+    #     for row in reader:
+    #         emails.append(Email(row[7], row[8], row[9], row[5], row[10]))
+    return emails
 
 
 if __name__ == '__main__':
