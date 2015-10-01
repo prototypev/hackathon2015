@@ -1,2 +1,3 @@
 pip install --upgrade google-api-python-client
 pip install pymongo
+https://github.com/heroku/simple-salesforce python setup.py install
