@@ -70,8 +70,8 @@ def crawl_inbox():
         for bareMessage in bare_messages:
             message_id = bareMessage.get('id')
             message = service.users().messages().get(userId=user_id, id=message_id).execute()
-
             email = parse_email(message)
+            print(email)
             emails.append(email)
     except errors.HttpError, error:
         print('An error occurred: %s' % error)
