@@ -20,13 +20,13 @@ def crawl():
     return str(len(messages)) + ' emails crawled'
 
 
-@app.route('/csv')
-def download_csv():
-    si = generate_csv_as_stringio(load_csv())
-    output = make_response(si.getvalue())
-    output.headers["Content-Disposition"] = "attachment; filename=export.csv"
-    output.headers["Content-type"] = "text/csv"
-    return output
+# @app.route('/csv')
+# def download_csv():
+#     si = generate_csv_as_stringio(load_csv())
+#     output = make_response(si.getvalue())
+#     output.headers["Content-Disposition"] = "attachment; filename=export.csv"
+#     output.headers["Content-type"] = "text/csv"
+#     return output
 
 
 def generate_csv_as_stringio(emails):
@@ -37,13 +37,13 @@ def generate_csv_as_stringio(emails):
     return si
 
 
-def load_csv():
-    emails = []
-    with open('EMAIL.CSV', 'rb') as csvfile:
-        spamreader = csv.reader(csvfile, skipinitialspace=True)
-        for row in spamreader:
-            emails.append(Email(row[7], row[8], row[9], row[5], row[10]))
-    return emails
+# def load_csv():
+#     emails = []
+#     with open('EMAIL.CSV', 'rb') as csvfile:
+#         spamreader = csv.reader(csvfile, skipinitialspace=True)
+#         for row in spamreader:
+#             emails.append(Email(row[7], row[8], row[9], row[5], row[10]))
+#     return emails
 
 if __name__ == '__main__':
     app.debug = True
