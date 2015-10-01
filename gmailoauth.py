@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import httplib2
 import argparse
+import re
 
 from apiclient import discovery
 from apiclient import errors
@@ -9,6 +10,8 @@ from apiclient import errors
 from oauth2client import file
 from oauth2client import tools
 from oauth2client.client import flow_from_clientsecrets
+
+from emailObject import Email
 
 
 try:
@@ -44,19 +47,53 @@ def crawl_inbox():
 
     user_id = 'me'
     query = 'label:inbox'
+    emails = []
     try:
         response = service.users().messages().list(userId=user_id, q=query).execute()
-        messages = []
+        bareMessages = []
         if 'messages' in response:
-            messages.extend(response['messages'])
+            bareMessages.extend(response['messages'])
 
         # The response may need to be paged, depending on the total number of messages that need to be returned
         while 'nextPageToken' in response:
             page_token = response['nextPageToken']
             response = service.users().messages().list(userId=user_id, q=query, pageToken=page_token).execute()
-            messages.extend(response['messages'])
+            bareMessages.extend(response['messages'])
 
-        return messages
+        for bareMessage in bareMessages:
+            message_id = bareMessage.get('id')
+            message = service.users().messages().get(userId=user_id, id=message_id).execute()
+
+            email = parse_email(message)
+            emails.append(email)
     except errors.HttpError, error:
         print('An error occurred: %s' % error)
 
+    return emails
+
+
+def parse_email(message):
+    message_id = message.get('id')
+    email = Email(message_id)
+    email.date = message.get('internalDate')
+
+    payload = message.get('payload')
+    headers = payload.get('headers')
+
+    for header in headers:
+        header_name = header.get('name')
+        header_value = header.get('value')
+
+        if header_name == 'From':
+            email.from_email = extract_email_and_name(header_value)
+        elif header_name == 'Delivered-To':
+            email.to_email = extract_email_and_name(header_value)
+        elif header_name == 'Cc':
+            email.cc_email = extract_email_and_name(header_value)
+
+    return email
+
+
+def extract_email_and_name(value):
+    # TODO
+    return value
