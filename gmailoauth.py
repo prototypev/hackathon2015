@@ -3,6 +3,7 @@ from __future__ import print_function
 import httplib2
 import argparse
 import re
+import os
 
 from apiclient import discovery
 from apiclient import errors
@@ -11,7 +12,7 @@ from oauth2client import file
 from oauth2client import tools
 from oauth2client.client import flow_from_clientsecrets
 
-from emailObject import Email
+from email_object import Email
 
 
 try:
@@ -24,6 +25,12 @@ CLIENT_SECRET_FILE = 'client_secret.json'
 CREDENTIALS_FILE = 'gmail-python.json'
 APPLICATION_NAME = 'Dream Killer'
 SCOPES = 'https://www.googleapis.com/auth/gmail.readonly'
+
+
+def revoke_credentials():
+    credentials = get_credentials()
+    credentials.revoke(httplib2.Http())
+    print('Credentials revoked')
 
 
 def get_credentials():
@@ -50,17 +57,17 @@ def crawl_inbox():
     emails = []
     try:
         response = service.users().messages().list(userId=user_id, q=query).execute()
-        bareMessages = []
+        bare_messages = []
         if 'messages' in response:
-            bareMessages.extend(response['messages'])
+            bare_messages.extend(response['messages'])
 
         # The response may need to be paged, depending on the total number of messages that need to be returned
         while 'nextPageToken' in response:
             page_token = response['nextPageToken']
             response = service.users().messages().list(userId=user_id, q=query, pageToken=page_token).execute()
-            bareMessages.extend(response['messages'])
+            bare_messages.extend(response['messages'])
 
-        for bareMessage in bareMessages:
+        for bareMessage in bare_messages:
             message_id = bareMessage.get('id')
             message = service.users().messages().get(userId=user_id, id=message_id).execute()
 
