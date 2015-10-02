@@ -53,7 +53,7 @@ def crawl_inbox():
     service = discovery.build('gmail', 'v1', http=http)
 
     user_id = 'me'
-    query = 'label:inbox'
+    query = 'label:inbox after:2010/06/01 before:2010/06/15'
     emails = []
     try:
         response = service.users().messages().list(userId=user_id, q=query).execute()
