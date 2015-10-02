@@ -2,9 +2,8 @@ from flask import Flask
 from flask import make_response
 from flask import render_template
 from StringIO import StringIO
-from email_object import Email
-import csv
 import mongo_presistence
+import datetime
 
 import gmailoauth
 
@@ -52,6 +51,8 @@ def download_csv():
 
 def generate_csv_as_stringio(emails):
     si = StringIO()
+    si.write("From,To,Date")
+    si.write("\n")
     for e in emails:
         try:
             si.write(str(e))
@@ -67,15 +68,10 @@ def load_csv():
     for email in emails:
         print email
         try:
-            result.append(email['from_email'] + ',' + email['to_email'] + ',' + email['date'])
+            date = datetime.datetime.fromtimestamp(float(email['date'])/1000).strftime('%Y-%m-%d')
+            result.append(email['from_email'] + ',' + email['to_email'] + ',' + date)
         except Exception as e:
             print e
-
-    # emails = []
-    # with open('EMAIL.CSV', 'rb') as csvfile:
-    #     reader = csv.reader(csvfile, skipinitialspace=True)
-    #     for row in reader:
-    #         emails.append(Email(row[7], row[8], row[9], row[5], row[10]))
     return result
 
 
